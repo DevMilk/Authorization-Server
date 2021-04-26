@@ -1,9 +1,11 @@
-package com.devmilk.mlform.payload.response;
+package com.devmilk.mlform.auth.payload.response;
 
+import com.devmilk.mlform.auth.models.Role;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter

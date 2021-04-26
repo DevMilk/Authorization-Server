@@ -1,4 +1,4 @@
-package com.devmilk.mlform.security.jwt;
+package com.devmilk.mlform.auth.security.jwt;
 
 import java.io.IOException;
 

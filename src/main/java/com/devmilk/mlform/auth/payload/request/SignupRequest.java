@@ -1,4 +1,4 @@
-package com.devmilk.mlform.payload.request;
+package com.devmilk.mlform.auth.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,8 +19,6 @@ public class SignupRequest {
     @Size(max = 50)
     @Email
     private String email;
-    
-    private Set<String> role;
     
     @NotBlank
     @Size(min = 6, max = 40)

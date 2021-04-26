@@ -1,4 +1,4 @@
-package com.devmilk.mlform.payload.response;
+package com.devmilk.mlform.auth.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

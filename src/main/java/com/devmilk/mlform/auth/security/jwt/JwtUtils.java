@@ -1,15 +1,14 @@
-package com.devmilk.mlform.security.jwt;
+package com.devmilk.mlform.auth.security.jwt;
 
 import java.util.Date;
 
+import com.devmilk.mlform.auth.security.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
-import com.devmilk.mlform.security.services.UserDetailsImpl;
 
 @Component
 public class JwtUtils {
@@ -26,7 +25,7 @@ public class JwtUtils {
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
 		return Jwts.builder()
-				.setSubject((userPrincipal.getEmail()))
+				.setSubject((userPrincipal.getUsername()))
 				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)

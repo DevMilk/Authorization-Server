@@ -1,4 +1,4 @@
-package com.devmilk.mlform.payload.request;
+package com.devmilk.mlform.auth.payload.request;
 
 import lombok.Getter;
 import lombok.Setter;
