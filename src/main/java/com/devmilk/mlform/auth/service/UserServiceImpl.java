@@ -1,13 +1,18 @@
 package com.devmilk.mlform.auth.service;
 
+import com.devmilk.mlform.auth.exceptions.InvalidTokenException;
 import com.devmilk.mlform.auth.exceptions.emailAlreadyExistsException;
 import com.devmilk.mlform.auth.exceptions.userNotFoundException;
 import com.devmilk.mlform.auth.models.Role;
 import com.devmilk.mlform.auth.models.User;
+import com.devmilk.mlform.auth.models.VerificationToken;
 import com.devmilk.mlform.auth.payload.response.JwtResponse;
 import com.devmilk.mlform.auth.security.jwt.JwtUtils;
+import com.devmilk.mlform.auth.security.services.EmailSenderService;
 import com.devmilk.mlform.auth.security.services.UserDetailsImpl;
+import javafx.geometry.VerticalDirection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +42,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	@Autowired
+	private EmailSenderService emailSenderService;
+
 	@Override
 	public User getUserByEmail(String email) throws userNotFoundException {
 		Optional<User> user = userRepository.findByEmail(email);
@@ -43,13 +52,39 @@ public class UserServiceImpl implements UserService {
 		return user.get();
 	}
 
-	public void createNewUser(String email, String password) throws emailAlreadyExistsException {
+	@Override
+	public void vertificateEmail(Long id) throws InvalidTokenException {
+
+		Optional<User> user = userRepository.findById(id);
+		if(!user.isPresent())
+			throw new InvalidTokenException("Invalid Token");
+		User user_to_enable = user.get();
+		user_to_enable.setEnabled(true);
+		userRepository.save(user_to_enable);
+	}
+
+	public User createNewUser(String email, String password) throws emailAlreadyExistsException {
 		if(userRepository.existsByEmail(email))
 			throw new emailAlreadyExistsException("Email already exists");
 
-		userRepository.save(new User(email,password));
+		User new_user = new User(email,new BCryptPasswordEncoder().encode(password));
+		userRepository.save(new_user);
+		return new_user;
 	}
 
+	@Override
+	public void sendEmailVertification(String auth_path,User user) {
+
+		System.out.println(user.getId());
+		String vertification_url = auth_path + "/vertification?token=" + user.getId();
+
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(user.getEmail());
+		message.setSubject("Email Vertification");
+		message.setText(vertification_url);
+		emailSenderService.sendEmail(message);
+
+	}
 
 
 	@Override

@@ -13,10 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 
 public class UserDetailsImpl implements UserDetails {
@@ -31,13 +27,15 @@ public class UserDetailsImpl implements UserDetails {
 
 	private Collection<? extends GrantedAuthority> authorities;
 
+	private boolean enabled;
 
 	public UserDetailsImpl(Long id, String email, String password,
-						   Collection<? extends GrantedAuthority> authorities) {
+						   Collection<? extends GrantedAuthority> authorities,boolean enabled) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.authorities = authorities;
+		this.enabled = enabled;
 	}
 
 	public static UserDetailsImpl build(User user) {
@@ -49,7 +47,8 @@ public class UserDetailsImpl implements UserDetails {
 				user.getId(),
 				user.getEmail(),
 				user.getPassword(),
-				authorities);
+				authorities,
+				user.getEnabled());
 	}
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -92,7 +91,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return enabled;
 	}
 
 	@Override

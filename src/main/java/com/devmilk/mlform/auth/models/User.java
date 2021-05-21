@@ -1,5 +1,6 @@
 package com.devmilk.mlform.auth.models;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,8 @@ public class User {
     @JsonIgnore
     private String password;
 
+    private boolean enabled;
+
     @NotBlank
     @ElementCollection(targetClass = Role.class)
     @CollectionTable(name = "user_role",
@@ -44,10 +47,14 @@ public class User {
     @Getter
     private Set<Role> roles;
 
+    private String token;
+
     public User(String email, String password){
         this.email = email;
         this.password = password;
         this.roles = new HashSet<>();
         this.roles.add(Role.USER);
+        this.enabled=false;
     }
+    public boolean getEnabled(){return enabled;}
 }

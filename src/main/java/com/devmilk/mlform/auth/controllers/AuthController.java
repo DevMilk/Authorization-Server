@@ -1,17 +1,16 @@
 package com.devmilk.mlform.auth.controllers;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.devmilk.mlform.auth.exceptions.InvalidTokenException;
 import com.devmilk.mlform.auth.exceptions.emailAlreadyExistsException;
+import com.devmilk.mlform.auth.models.VerificationToken;
 import com.devmilk.mlform.auth.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.devmilk.mlform.auth.payload.request.LoginRequest;
 import com.devmilk.mlform.auth.payload.request.SignupRequest;
@@ -24,7 +23,6 @@ public class AuthController {
 
 	@Autowired
 	UserService userService;
-
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -34,17 +32,33 @@ public class AuthController {
 
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+	public ResponseEntity<?> registerUser(HttpServletRequest request, @Valid @RequestBody SignupRequest signUpRequest) {
 
 		try {
-			userService.createNewUser(signUpRequest.getEmail(),signUpRequest.getPassword());
+			userService.sendEmailVertification(request.getRequestURI(),
+					userService.createNewUser(signUpRequest.getEmail(),signUpRequest.getPassword())
+			);
 			return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 		}
 		catch(emailAlreadyExistsException e){
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Email is already in use!"));
+					.body(new MessageResponse(e.getMessage()));
 		}
 
+	}
+
+	@GetMapping("/vertification")
+	public ResponseEntity<?> registerUser(@Valid @RequestParam Long token) {
+
+		try {
+			userService.vertificateEmail(token);
+		} catch (InvalidTokenException e) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse(e.getMessage()));
+		}
+
+		return ResponseEntity.ok(new MessageResponse("Email vertificated"));
 	}
 }
