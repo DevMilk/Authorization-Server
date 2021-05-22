@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(	name = "users",
@@ -23,7 +24,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
@@ -50,6 +50,7 @@ public class User {
     private String token;
 
     public User(String email, String password){
+        this.id = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
         this.email = email;
         this.password = password;
         this.roles = new HashSet<>();

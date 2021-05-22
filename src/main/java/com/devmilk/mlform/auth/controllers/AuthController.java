@@ -23,6 +23,19 @@ public class AuthController {
 
 	@Autowired
 	UserService userService;
+
+	private String getPathUrlOfController(HttpServletRequest request){
+		String urlWithCurrentEndpoint = request.getRequestURL().toString();
+		return urlWithCurrentEndpoint.substring(0,
+				urlWithCurrentEndpoint.lastIndexOf('/'));
+	}
+
+	@GetMapping("/test")
+	public String get(HttpServletRequest request) {
+		return getPathUrlOfController(request);
+	}
+
+
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -35,7 +48,7 @@ public class AuthController {
 	public ResponseEntity<?> registerUser(HttpServletRequest request, @Valid @RequestBody SignupRequest signUpRequest) {
 
 		try {
-			userService.sendEmailVertification(request.getRequestURI(),
+			userService.sendEmailVertification(getPathUrlOfController(request),
 					userService.createNewUser(signUpRequest.getEmail(),signUpRequest.getPassword())
 			);
 			return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
@@ -61,4 +74,5 @@ public class AuthController {
 
 		return ResponseEntity.ok(new MessageResponse("Email vertificated"));
 	}
+
 }
