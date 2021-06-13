@@ -33,7 +33,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			"/swagger-ui.html",
 			"/v3/api-docs/**",
 			"/api/test/**",
-			"/api/auth/**"
+			"/api/auth/**",
+			"/**"
 	};
 
 	@Autowired
